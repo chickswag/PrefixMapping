@@ -4,62 +4,42 @@
 class Prefix
 {
 
-
     /**
-     * string $number
-     * returns null
+     * @param $number
+     * @return mixed|string
      */
      public static function getDestination($number){
-
-         //strip the first 3 chars prefix
-         $first_prefix_3_numbers = substr($number, 0, 3);
-
-         $suffix = str_replace($first_prefix_3_numbers,'',$number);
-         if(strlen($suffix) >= 4){
-
-             $number_search = substr($suffix, 0, 4);
-             //check the number
-             $prefixname = Prefix::getPrefix($first_prefix_3_numbers.$number_search);
-         }
-         else{
-             //check the number
-             $prefixname = Prefix::getPrefix($first_prefix_3_numbers);
-         }
-
-         if($prefixname){
-             return $prefixname->prefix_name;
-         }
-         else{
-             //last try using the first 3 characters
-             $prefixname = Prefix::getPrefix($first_prefix_3_numbers);
-             if($prefixname){
-                 return $prefixname->prefix_name;
-             }
-             else{
-                 echo 'Invalid number';
-             }
-
-         }
-
+         $get_destination = Prefix::getPrefix($number);
+         return ($get_destination)  ?  $get_destination : 'Invalid number';
      }
+
     /**
-     * string $number
-     * returns object
+     * @param $number
+     * @return mixed|string
      */
      public static function getPrefix($number){
 
-         global $connect_db;
-
-         $sql = "SELECT prefix_name FROM PrefixMap where prefix_number like '$number%'";
-         $query = $connect_db->query($sql);
-         $results = $query->fetch_object();
-
-         return $results;
-
+         global $getData;
+         $first_prefix_3_numbers = substr($number, 0, 3);
+         $suffix = str_replace($first_prefix_3_numbers,'',$number);
+         $destination = "";
+         foreach ($getData as $data){
+             if(in_array($first_prefix_3_numbers,$data)){
+                 $destination = $data[1];
+             }
+             $trail_number = substr($data[2], 0, 7);
+             if($trail_number){
+                 if($first_prefix_3_numbers.$suffix == $trail_number){
+                     $destination = $data[1];
+                 }
+             }
+         }
+         return $destination;
      }
 
     /**
-     * string $number
+     * @param $number
+     * @return string
      */
      public static function changeDestination($number){
          try{
